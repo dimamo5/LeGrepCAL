@@ -20,6 +20,8 @@ private:
 	int const ALPHABET_SIZE = 256;
 	string haystack;
 	string needle;
+	vector<int> charTable;
+	vector<int> offsetTable;
 
 	vector<int> makeCharTable(string needle);
 	vector<int> makeOffsetTable(string needle);
@@ -29,6 +31,7 @@ private:
 public:
 	BoyerMoore(string haystack, string needle);
 	int indexOf(string haystack, string needle);
+	vector<int> indexOfAll(string haystack, string needle);
 	const string& getHaystack() const;
 	const string& getNeedle() const;
 };
