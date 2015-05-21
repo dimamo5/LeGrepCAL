@@ -15,44 +15,51 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	cout << "BoyerMoore" << endl; // prints !!!Hello World!!!
+	cout << "BoyerMoore" << endl;
 
 	int linhasAntes = 1, linhasDepois = 1, temp;
 
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
-		cout<<argc<<endl;
-		if (flag == "-A" && argc > 2) {
-			cout<<"entra";
-			if (stringstream(argv[i + 1]) >> temp) {
-				if (isdigit(temp)) {
-					cerr << "Argumento " << argv[i + 1] << "não é um numero de linha";
-				} else if (linhasAntes > temp) {
-					linhasAntes = temp;
-				}
-			}
 
-		} else if (flag == "-B" && argc > 2) {
-			if (stringstream(argv[i + 1]) >> temp) {
-				if (isdigit(temp)) {
-					cerr << "Argumento " << argv[i + 1] << "não é um numero de linha";
-				} else if (linhasAntes > temp) {
-					linhasDepois = temp;
-				}
-			}
+		if (flag == "-A" && i + 1 <= argc) {
+			stringstream(argv[i + 1]) >> temp;
 
+			if (!isdigit(argv[i + 1][0])) {
+				cerr << "Argumento " << argv[i + 1] << " não é um numero de linha" << endl;
+				return 1;
+			} else if (linhasAntes <= temp) {
+				linhasAntes = temp;
+			}
+			i++;
+		} else if (flag == "-B" && i + 1 <= argc) {
+			stringstream(argv[i + 1]) >> temp;
+
+			if (!isdigit(argv[i + 1][0])) {
+				cerr << "Argumento " << argv[i + 1] << " não é um numero de linha" << endl;
+				return 2;
+			} else if (linhasAntes <= temp) {
+				linhasDepois = temp;
+			}
+			i++;
+		} else if (flag == "-C" && i + 1 < argc) {
+			stringstream(argv[i + 1]) >> temp;
+
+			if (!isdigit(argv[i + 1][0])) {
+				cerr << "Argumento " << argv[i + 1] << " não é um numero de linha" << endl;
+				return 3;
+			} else if (linhasAntes <= temp && linhasDepois <= temp) {
+				linhasDepois = temp;
+				linhasAntes = temp;
+			}
+			i++;
+		} else {
+			cerr << "Argumentos incorrectos!!!" << endl;
 		}
-		if (flag == "-C" && argc > 2) {
-			if (stringstream(argv[i + 1]) >> temp) {
-				if (isdigit(temp)) {
-					cerr << "Argumento " << argv[i + 1] << "não é um numero de linha";
-				} else if (linhasAntes > temp) {
-					linhasDepois = temp;
-				}
-			}
 
-		}
 	}
+
+	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << endl;
 
 	ifstream ficheiro;
 	ficheiro.open("resources/1.txt");
@@ -60,7 +67,7 @@ int main(int argc, char* argv[]) {
 
 	//cout << haystack << endl;
 
-	BoyerMoore teste(haystack, "name");
+	BoyerMoore teste(haystack, "Sherlock");
 
 	vector<int> resultados = teste.indexOfAll(teste.getHaystack(), teste.getNeedle());
 	cout << "nr de resultados:" << resultados.size() << endl;
