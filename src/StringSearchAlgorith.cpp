@@ -12,3 +12,14 @@ StringSearchAlgorith::StringSearchAlgorith(string haystack, string needle) :
 
 }
 
+StringSearchAlgorith::StringSearchAlgorith() {
+
+}
+
+string StringSearchAlgorith::getHaystack() const {
+	return haystack;
+}
+
+string StringSearchAlgorith::getNeedle() const {
+	return needle;
+}

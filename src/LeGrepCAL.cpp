@@ -11,7 +11,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
-#include "BoyerMoore.h"
+#include "Grep.h"
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 			if (!isdigit(argv[i + 1][0])) {
 				cerr << "Argumento " << argv[i + 1] << " não é um numero de linha" << endl;
 				return 1;
-			} else if (linhasAntes <= temp) {
-				linhasAntes = temp;
+			} else if (linhasDepois <= temp) {
+				linhasDepois = temp;
 			}
 			i++;
 		} else if (flag == "-B" && i + 1 <= argc) {
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 				cerr << "Argumento " << argv[i + 1] << " não é um numero de linha" << endl;
 				return 2;
 			} else if (linhasAntes <= temp) {
-				linhasDepois = temp;
+				linhasAntes = temp;
 			}
 			i++;
 		} else if (flag == "-C" && i + 1 < argc) {
@@ -65,17 +65,10 @@ int main(int argc, char* argv[]) {
 	ficheiro.open("resources/1.txt");
 	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
-	//cout << haystack << endl;
-
-	BoyerMoore teste(haystack, "Sherlock");
-
-	vector<int> resultados = teste.indexOfAll(teste.getHaystack(), teste.getNeedle());
-	cout << "nr de resultados:" << resultados.size() << endl;
-	cout << "resultados:" << resultados[0] << endl;
-
-	for (int i = 0; i < resultados.size(); i++) {
-		cout << haystack[resultados[i]] << haystack[resultados[i] + 1] << haystack[resultados[i] + 2] << haystack[resultados[i] + 3] << endl;
-	}
+	Grep grep(linhasAntes,linhasDepois,false,false,haystack,"Holmes",Grep::BOYER_MOORE);
+	grep.run();
+	grep.formatResults();
+	cout<<grep.getResult();
 
 	return 0;
 }

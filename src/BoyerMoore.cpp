@@ -8,18 +8,9 @@
 #include "BoyerMoore.h"
 
 BoyerMoore::BoyerMoore(string haystack, string needle) :
-		haystack(haystack), needle(needle) {
-	this->charTable = makeCharTable(needle);
-	this->offsetTable = makeOffsetTable(needle);
-
-}
-
-const string& BoyerMoore::getHaystack() const {
-	return haystack;
-}
-
-const string& BoyerMoore::getNeedle() const {
-	return needle;
+		StringSearchAlgorith(haystack, needle) {
+	this->charTable = makeCharTable();
+	this->offsetTable = makeOffsetTable();
 }
 
 /**
@@ -30,32 +21,29 @@ const string& BoyerMoore::getNeedle() const {
  * @param needle The target string to search
  * @return The start index of the substring
  */
-int BoyerMoore::indexOf(string haystack, string needle) {
+int BoyerMoore::indexOfFirst() {
 	if (needle.length() == 0) {
 		return 0;
 	}
-	vector<int> charTable = makeCharTable(needle);
-	vector<int> offsetTable = makeOffsetTable(needle);
 	for (int i = needle.length() - 1, j; i < haystack.length();) {
 		for (j = needle.length() - 1; needle[j] == haystack[i]; --i, --j) {
 			if (j == 0) {
 				return i;
 			}
 		}
-		// i += needle.length - j; // For naive method
 		i += fmax(offsetTable[needle.length() - 1 - j], charTable[haystack[i]]);
 	}
 	return -1;
 }
 
-vector<int> BoyerMoore::indexOfAll(string haystack, string needle) {
+vector<int> BoyerMoore::run() {
 	vector<int> results;
 	if (needle.length() == 0) {
 		return results;
 	}
-	vector<int> charTable = makeCharTable(needle);
-	vector<int> offsetTable = makeOffsetTable(needle);
+
 	for (int i = needle.length() - 1, j; i < haystack.length();) {
+		//for (j = needle.length() - 1; tolower(needle[j]) == tolower(haystack[i]); --i, --j) {
 		for (j = needle.length() - 1; needle[j] == haystack[i]; --i, --j) {
 			if (j == 0) {
 				results.push_back(i);
@@ -71,12 +59,9 @@ vector<int> BoyerMoore::indexOfAll(string haystack, string needle) {
 /**
  * Makes the jump table based on the mismatched character information.
  */
-vector<int> BoyerMoore::makeCharTable(string needle) {
-//        final int ;
-	vector<int> table(256, needle.length());
-//        for (int i = 0; i < table.size(); ++i) {
-//            table[i] = needle.length();
-//        }
+vector<int> BoyerMoore::makeCharTable() {
+	vector<int> table(ALPHABET_SIZE, needle.length());
+
 	for (unsigned int i = 0; i < needle.length() - 1; i++) {
 		table[needle[i]] = needle.length() - 1 - i;
 	}
@@ -86,8 +71,9 @@ vector<int> BoyerMoore::makeCharTable(string needle) {
 /**
  * Makes the jump table based on the scan offset which mismatch occurs.
  */
-vector<int> BoyerMoore::makeOffsetTable(string needle) {
+vector<int> BoyerMoore::makeOffsetTable() {
 	vector<int> table(needle.length());
+
 	int lastPrefixPosition = needle.length();
 
 	for (int i = needle.length() - 1; i >= 0; i--) {
