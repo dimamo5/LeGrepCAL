@@ -50,7 +50,6 @@ vector<int> BoyerMoore::run() {
 				break;
 			}
 		}
-		// i += needle.length - j; // For naive method
 		i += fmax(offsetTable[needle.length() - 1 - j], charTable[haystack[i]]);
 	}
 	return results;

@@ -11,6 +11,7 @@
 #include <string>
 #include "StringSearchAlgorith.h"
 #include "BoyerMoore.h"
+#include "naive.h"
 
 using namespace std;
 
@@ -39,6 +40,8 @@ public:
 	void formatResults();
 
 	string getResult();
+
+	void changeAlgoritmo(SSA novoAlgoritmo);
 
 };
 

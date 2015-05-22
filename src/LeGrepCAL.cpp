@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
 #include <sstream>
 #include <cctype>
 #include "Grep.h"
@@ -62,13 +63,22 @@ int main(int argc, char* argv[]) {
 	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << endl;
 
 	ifstream ficheiro;
-	ficheiro.open("resources/1.txt");
+	ficheiro.open("resources/out.txt");
 	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
-	Grep grep(linhasAntes,linhasDepois,false,false,haystack,"Holmes",Grep::BOYER_MOORE);
+
+
+	Grep grep(linhasAntes, linhasDepois, false, false, haystack, "Holmes", Grep::NAIVE);
+	clock_t begin = clock();
 	grep.run();
+	clock_t end = clock();
 	grep.formatResults();
-	cout<<grep.getResult();
+	cout << grep.getResult();
+
+
+	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+	cout << "Tempo" << elapsed_secs << endl;
 
 	return 0;
 }

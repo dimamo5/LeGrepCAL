@@ -12,6 +12,8 @@ Grep::Grep(int la, int ld, bool ic, bool im, string haystack, string needle, SSA
 		linhasAntes(la), linhasDepois(ld), ignoreCase(ic), invertMatch(im), haystack(haystack), needle(needle) {
 	if (algoritmo == BOYER_MOORE) {
 		this->algoritmo = new BoyerMoore(haystack, needle);
+	} else if (algoritmo == NAIVE) {
+		this->algoritmo = new Naive(haystack, needle);
 	}
 }
 
@@ -26,6 +28,7 @@ void Grep::run() {
 void Grep::formatResults() {
 
 	unsigned int j, ite;
+	char lastChar = '\0';
 
 	string resultados_temp;
 
@@ -34,23 +37,24 @@ void Grep::formatResults() {
 		ite = resultados[i];
 
 		while (j < linhasAntes) {
-			if (haystack[ite] == '\n') {
+			if (haystack[ite] == '\n' && lastChar != '\n') {
 				j++;
 			}
 			resultados_temp = haystack[ite] + resultados_temp;
+			lastChar = haystack[ite];
 			ite--;
-			//cout<<result<<endl;
 		}
 
 		j = 0;
 
-		ite = resultados[i]+1;
+		ite = resultados[i] + 1;
 
 		while (j < linhasDepois) {
-			if (haystack[ite] == '\n') {
+			if (haystack[ite] == '\n' && lastChar != '\n') {
 				j++;
 			}
 			resultados_temp = resultados_temp + haystack[ite];
+			lastChar = haystack[ite];
 			ite++;
 		}
 
@@ -58,9 +62,22 @@ void Grep::formatResults() {
 		result += resultados_temp;
 		resultados_temp.clear();
 	}
+	result+='\n';
 
 }
 
 string Grep::getResult() {
 	return result;
+}
+
+void Grep::changeAlgoritmo(SSA novoAlgoritmo) {
+	if (this->algoritmo != NULL) {
+		delete (this->algoritmo);
+
+		if (novoAlgoritmo == BOYER_MOORE) {
+			this->algoritmo = new BoyerMoore(haystack, needle);
+		} else if (novoAlgoritmo == NAIVE) {
+			this->algoritmo = new Naive(haystack, needle);
+		}
+	}
 }
