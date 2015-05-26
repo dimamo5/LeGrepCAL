@@ -19,7 +19,7 @@ class Naive: public StringSearchAlgorith {
 public:
 	Naive(string haystack, string needle);
 
-	vector<int> run();
+	vector<int> run(bool (*compareFunc)(char, char));
 };
 
 #endif /* NAIVE_H_ */

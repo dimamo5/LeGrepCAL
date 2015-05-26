@@ -43,6 +43,11 @@ public:
 
 	void changeAlgoritmo(SSA novoAlgoritmo);
 
+	//Funcoes de Comparação
+
+	static bool compareCaseSensative(char c1, char c2);
+
+	static bool compareCaseInsensative(char c1, char c2);
 };
 
 #endif /* GREP_H_ */

@@ -22,48 +22,83 @@ Grep::Grep(string haystack, string needle, SSA algoritmo) {
 }
 
 void Grep::run() {
-	resultados = algoritmo->run();
+	if (this->ignoreCase) {
+		resultados = algoritmo->run(this->compareCaseInsensative);
+	} else {
+		resultados = algoritmo->run(compareCaseSensative);
+	}
 }
 
 void Grep::formatResults() {
 
-	unsigned int j, ite;
+	unsigned int j = 0, ite, inicioLinha = 0, fimLinha = 0;
 	char lastChar = '\0';
-
 	string resultados_temp;
 
-	for (unsigned int i = 0; i < resultados.size(); i++) {
-		j = 0;
-		ite = resultados[i];
+	//cout << haystack[73219] << " " << haystack[73223] << endl;
 
-		while (j < linhasAntes) {
-			if (haystack[ite] == '\n' && lastChar != '\n') {
-				j++;
+
+	if (invertMatch) {
+		resultados_temp = haystack;
+
+		for (unsigned int i = 0; i < resultados.size(); i++) {
+			ite = resultados[i] - j;
+
+			while (resultados_temp[ite] != '\n' && ite >= 0) {
+				ite--;
 			}
-			resultados_temp = haystack[ite] + resultados_temp;
-			lastChar = haystack[ite];
-			ite--;
-		}
 
-		j = 0;
+			inicioLinha = ite;
 
-		ite = resultados[i] + 1;
+			ite = resultados[i] - j;
 
-		while (j < linhasDepois) {
-			if (haystack[ite] == '\n' && lastChar != '\n') {
-				j++;
+			while (resultados_temp[ite] != '\n' && ite < resultados_temp.length()) {
+				ite++;
 			}
-			resultados_temp = resultados_temp + haystack[ite];
-			lastChar = haystack[ite];
-			ite++;
-		}
 
-		resultados_temp += "--------";
-		result += resultados_temp;
-		resultados_temp.clear();
+			fimLinha = ite;
+			j += fimLinha - inicioLinha;
+
+			//cout << "I:" << i << "\tLA:" << inicioLinha << "\t LD:" << fimLinha << "\t J:" << j <<"Tamanho:"<<resultados_temp.length()<< endl;
+
+			resultados_temp.erase(inicioLinha, fimLinha-inicioLinha);
+		}
+		result = resultados_temp;
+		return;
+
+	} else {
+		for (unsigned int i = 0; i < resultados.size(); i++) {
+			j = 0;
+			ite = resultados[i];
+
+			while (j < linhasAntes) {
+				if (haystack[ite] == '\n' && lastChar != '\n') {
+					j++;
+				}
+				resultados_temp = haystack[ite] + resultados_temp;
+				lastChar = haystack[ite];
+				ite--;
+			}
+
+			j = 0;
+
+			ite = resultados[i] + 1;
+
+			while (j < linhasDepois) {
+				if (haystack[ite] == '\n' && lastChar != '\n') {
+					j++;
+				}
+				resultados_temp = resultados_temp + haystack[ite];
+				lastChar = haystack[ite];
+				ite++;
+			}
+
+			resultados_temp += "--------";
+			result += resultados_temp;
+			resultados_temp.clear();
+		}
+		result += '\n';
 	}
-	result+='\n';
-
 }
 
 string Grep::getResult() {
@@ -80,4 +115,18 @@ void Grep::changeAlgoritmo(SSA novoAlgoritmo) {
 			this->algoritmo = new Naive(haystack, needle);
 		}
 	}
+}
+
+bool Grep::compareCaseSensative(char c1, char c2) {
+	if (c1 == c2) {
+		return true;
+	} else
+		return false;
+}
+
+bool Grep::compareCaseInsensative(char c1, char c2) {
+	if (tolower(c1) == tolower(c2)) {
+		return true;
+	} else
+		return false;
 }

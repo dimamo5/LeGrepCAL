@@ -22,7 +22,7 @@ public:
 	StringSearchAlgorith();
 	StringSearchAlgorith(string haystack, string needle);
 
-	virtual vector<int> run() = 0; //funtao que tem de ser implementada pelas classes derivadas
+	virtual vector<int> run(bool (*compareFunc)(char, char)) = 0; //funtao que tem de ser implementada pelas classes derivadas
 
 	string getHaystack() const;
 	string getNeedle() const;

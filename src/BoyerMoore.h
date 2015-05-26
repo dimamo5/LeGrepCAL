@@ -31,7 +31,7 @@ private:
 public:
 	BoyerMoore(string haystack, string needle);
 	int indexOfFirst();
-	vector<int> run();
+	vector<int> run(bool (*compareFunc)(char, char));
 };
 
 #endif /* BOYERMOORE_H_ */

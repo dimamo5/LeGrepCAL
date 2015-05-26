@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
 	cout << "BoyerMoore" << endl;
 
 	int linhasAntes = 1, linhasDepois = 1, temp;
+	bool invertMatch = false, ignoreCase = false;
 
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
@@ -54,27 +55,31 @@ int main(int argc, char* argv[]) {
 				linhasAntes = temp;
 			}
 			i++;
+		} else if (flag == "-i") {
+			ignoreCase = true;
+
+		} else if (flag == "-v") {
+			invertMatch = true;
 		} else {
 			cerr << "Argumentos incorrectos!!!" << endl;
 		}
-
 	}
 
-	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << endl;
+	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << "\t Case Sensative: " << ignoreCase << "\t Invert Match: " << invertMatch
+			<< endl;
 
 	ifstream ficheiro;
-	ficheiro.open("resources/out.txt");
+	ficheiro.open("resources/1.txt");
 	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
+	cout << "Tamanho:" << haystack.length() << endl;
 
-
-	Grep grep(linhasAntes, linhasDepois, false, false, haystack, "Holmes", Grep::NAIVE);
+	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "mention her under any other name", Grep::BOYER_MOORE);
 	clock_t begin = clock();
 	grep.run();
 	clock_t end = clock();
 	grep.formatResults();
-	cout << grep.getResult();
-
+	cout << grep.getResult()<<endl;
 
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 

@@ -36,15 +36,14 @@ int BoyerMoore::indexOfFirst() {
 	return -1;
 }
 
-vector<int> BoyerMoore::run() {
+vector<int> BoyerMoore::run(bool (*compareFunc)(char, char)) {
 	vector<int> results;
 	if (needle.length() == 0) {
 		return results;
 	}
 
 	for (int i = needle.length() - 1, j; i < haystack.length();) {
-		//for (j = needle.length() - 1; tolower(needle[j]) == tolower(haystack[i]); --i, --j) {
-		for (j = needle.length() - 1; needle[j] == haystack[i]; --i, --j) {
+		for (j = needle.length() - 1; compareFunc(needle[j], haystack[i]); --i, --j) {
 			if (j == 0) {
 				results.push_back(i);
 				break;
