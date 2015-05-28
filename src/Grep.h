@@ -11,7 +11,8 @@
 #include <string>
 #include "StringSearchAlgorith.h"
 #include "BoyerMoore.h"
-#include "naive.h"
+#include "Naive.h"
+#include "KMP.h"
 
 using namespace std;
 

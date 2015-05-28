@@ -69,12 +69,12 @@ int main(int argc, char* argv[]) {
 			<< endl;
 
 	ifstream ficheiro;
-	ficheiro.open("resources/1.txt");
+	ficheiro.open("resources/out.txt");
 	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
 	cout << "Tamanho:" << haystack.length() << endl;
 
-	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "mention her under any other name", Grep::BOYER_MOORE);
+	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "Holmes", Grep::KMP);
 	clock_t begin = clock();
 	grep.run();
 	clock_t end = clock();
