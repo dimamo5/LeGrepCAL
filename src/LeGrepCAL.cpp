@@ -7,6 +7,7 @@
 //============================================================================
 
 #include <iostream>
+#include <windows.h>
 #include <fstream>
 #include <string>
 #include <ctime>
@@ -16,13 +17,14 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	cout << "BoyerMoore" << endl;
+	cout << "Grep" << endl;
 
 	int linhasAntes = 1, linhasDepois = 1, temp;
 	bool invertMatch = false, ignoreCase = false;
 
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
+		//TODO Falta flags alternativas para cada tipo
 
 		if (flag == "-A" && i + 1 <= argc) {
 			stringstream(argv[i + 1]) >> temp;
@@ -60,7 +62,46 @@ int main(int argc, char* argv[]) {
 
 		} else if (flag == "-v") {
 			invertMatch = true;
-		} else {
+		} else if (flag.compare(0, 16, "--after-context=") == 0) {
+			stringstream(flag.substr(16, flag.length())) >> temp;
+			if (temp >= 99) {
+				cerr << "Numero Linhas exagerado " << endl;
+				return 0;
+			} else {
+				if (linhasDepois < temp) {
+					linhasDepois = temp;
+				}
+			}
+		} else if (flag.compare(0, 17, "--before-context=") == 0) {
+			stringstream(flag.substr(17, flag.length())) >> temp;
+			if (temp >= 99) {
+				cerr << "Numero Linhas exagerado " << endl;
+				return 0;
+			} else {
+				if (linhasAntes < temp) {
+					linhasAntes = temp;
+				}
+			}
+		} else if (flag.compare(0, 10, "--context=") == 0) {
+			stringstream(flag.substr(10, flag.length())) >> temp;
+			if (temp >= 99) {
+				cerr << "Numero Linhas exagerado " << endl;
+				return 0;
+			} else {
+				if (linhasAntes < temp) {
+					linhasAntes = temp;
+				}
+				if (linhasDepois < temp) {
+					linhasDepois = temp;
+				}
+			}
+		} else if (flag == "--ignore-case") {
+			ignoreCase = true;
+		} else if (flag == "--invert-match") {
+			invertMatch = true;
+		}
+
+		else {
 			cerr << "Argumentos incorrectos!!!" << endl;
 		}
 	}
@@ -69,22 +110,35 @@ int main(int argc, char* argv[]) {
 			<< endl;
 
 	ifstream ficheiro;
-	ficheiro.open("resources/1.txt");
+	ficheiro.open("resources/out.txt");
 	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
-	cout << "Tamanho:" << haystack.length() << endl;
+	cout << "Tamanho Haystack:" << haystack.length() << endl;
 
-	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "mention her under any other name", Grep::BOYER_MOORE);
+	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "Sherlock Holmes", Grep::BOYER_MOORE);
 	clock_t begin = clock();
 	grep.run();
 	clock_t end = clock();
-	grep.formatResults();
-	cout << grep.getResult()<<endl;
 
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 
-	cout << "Tempo" << elapsed_secs << endl;
+	cout << "Tempo Pesquisa" << elapsed_secs << endl;
+
+	begin = clock();
+	grep.formatResults();
+	end = clock();
+	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+	cout << "Tempo Reorganização de Output" << elapsed_secs << endl << endl;
+
+	cout << grep.getResult() << endl;
 
 	return 0;
+}
+
+// First 4 bits are background, last 4 bits are foreground
+void cor(int background, int foreground) {
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, foreground + 16 * background);
 }
 

@@ -31,12 +31,10 @@ void Grep::run() {
 
 void Grep::formatResults() {
 
-	unsigned int j = 0, ite, inicioLinha = 0, fimLinha = 0;
+	unsigned int j = 0, inicioLinha = 0, fimLinha = 0;
+	int ite;
 	char lastChar = '\0';
 	string resultados_temp;
-
-	//cout << haystack[73219] << " " << haystack[73223] << endl;
-
 
 	if (invertMatch) {
 		resultados_temp = haystack;
@@ -59,9 +57,7 @@ void Grep::formatResults() {
 			fimLinha = ite;
 			j += fimLinha - inicioLinha;
 
-			//cout << "I:" << i << "\tLA:" << inicioLinha << "\t LD:" << fimLinha << "\t J:" << j <<"Tamanho:"<<resultados_temp.length()<< endl;
-
-			resultados_temp.erase(inicioLinha, fimLinha-inicioLinha);
+			resultados_temp.erase(inicioLinha, fimLinha - inicioLinha);
 		}
 		result = resultados_temp;
 		return;
@@ -71,10 +67,11 @@ void Grep::formatResults() {
 			j = 0;
 			ite = resultados[i];
 
-			while (j < linhasAntes) {
+			while (j < linhasAntes && ite >= 0) {
 				if (haystack[ite] == '\n' && lastChar != '\n') {
 					j++;
 				}
+
 				resultados_temp = haystack[ite] + resultados_temp;
 				lastChar = haystack[ite];
 				ite--;
@@ -84,7 +81,7 @@ void Grep::formatResults() {
 
 			ite = resultados[i] + 1;
 
-			while (j < linhasDepois) {
+			while (j < linhasDepois && ite < haystack.length()) {
 				if (haystack[ite] == '\n' && lastChar != '\n') {
 					j++;
 				}
