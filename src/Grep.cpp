@@ -14,6 +14,8 @@ Grep::Grep(int la, int ld, bool ic, bool im, string haystack, string needle, SSA
 		this->algoritmo = new BoyerMoore(haystack, needle);
 	} else if (algoritmo == NAIVE) {
 		this->algoritmo = new Naive(haystack, needle);
+	}else if (algoritmo == KMP) {
+		this->algoritmo = new kmp(haystack, needle);
 	}
 }
 
@@ -25,7 +27,7 @@ void Grep::run() {
 	if (this->ignoreCase) {
 		resultados = algoritmo->run(this->compareCaseInsensative);
 	} else {
-		resultados = algoritmo->run(compareCaseSensative);
+		resultados = algoritmo->run(this->compareCaseSensative);
 	}
 }
 
