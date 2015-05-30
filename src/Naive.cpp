@@ -18,7 +18,7 @@ vector<int> Naive::run(bool (*compareFunc)(char, char)) {
 	vector<int> resultados;
 	for (unsigned int i = 0; i < haystack.length(); i++) {
 		for (unsigned int j = 0; j < needle.length(); j++) {
-			if (haystack[i+j] != needle[j]) {
+			if (!compareFunc(haystack[i + j], needle[j])) {
 				break;
 			} else if (j == needle.length() - 1) {
 				resultados.push_back(i);

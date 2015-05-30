@@ -16,6 +16,10 @@
 
 using namespace std;
 
+/**
+ * @brief Algoritmo de Pesquisa de String Boyer Moore
+ *
+ */
 class BoyerMoore: public StringSearchAlgorith {
 private:
 
@@ -30,7 +34,15 @@ private:
 
 public:
 	BoyerMoore(string haystack, string needle);
+	/**
+	 * Executa o Algoritmo
+	 * @return Retorna apenas a primeira corespondencia encontrada
+	 */
 	int indexOfFirst();
+	/**
+	 * Executa o Algoritmo
+	 * @return Todas as correspondencias encontradas
+	 */
 	vector<int> run(bool (*compareFunc)(char, char));
 };
 

@@ -15,6 +15,10 @@
 
 using namespace std;
 
+/**
+ * @brief Algoritmo de Pesquisa de String Naive
+ * Compara na Haystack caracter a caracter
+ */
 class Naive: public StringSearchAlgorith {
 public:
 	Naive(string haystack, string needle);

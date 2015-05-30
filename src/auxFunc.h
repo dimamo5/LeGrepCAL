@@ -1,6 +1,9 @@
+#ifndef _AUX_FUNC_H_
+#define _AUX_FUNC_H_
+
 #include <windows.h>
 
-/**< Macros de cores para usar no menu */
+/**< Macros de cores */
 #define BLACK 0  // 0000
 #define BLUE 1   // 0001
 #define GREEN 2  // 0010
@@ -13,8 +16,15 @@
 #define LIGHT_GREEN 10 // 1010  -> GREEN with intensity at 1
 #define LIGHT_RED 12  // 1100  -> RED with intensity at 1
 
+/**
+ *Funcao que muda a cor da consola
+ *@param background cor de fundo
+ *@param foreground Cor do texto
+ */
 void cor(int background, int foreground) {
 	HANDLE hConsole;
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, foreground + 16 * background);
 }
+
+#endif //_AUX_FUNC_H_

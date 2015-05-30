@@ -13,6 +13,10 @@
 
 using namespace std;
 
+/**
+ * @brief Classe Mae Abstrata de Algoritmos de Pesquisa de Strings
+ * Obriga a implementacao da funcao run que executa o algoritmo
+ */
 class StringSearchAlgorith {
 protected:
 	string haystack;

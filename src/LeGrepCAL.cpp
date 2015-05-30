@@ -7,12 +7,12 @@
 //============================================================================
 
 #include <iostream>
+#include "thread.h"
 #include <windows.h>
 #include <fstream>
 #include <string>
 #include <ctime>
 #include <sstream>
-#include "mingw.thread.h"
 #include <cctype>
 #include "Grep.h"
 #include "auxFunc.h"
@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
 	//Analisar Flags introduzidas e activar respetivas flags
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
-		//TODO Falta flags alternativas para cada tipo
 
 		if (flag == "-A" && i + 1 <= argc) {
 			stringstream(argv[i + 1]) >> temp;
@@ -132,6 +131,10 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+//	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << "\t Case Sensative: " << ignoreCase << "\t Invert Match: " << invertMatch
+//				<< endl;
+
+
 	//Verificar se existe a palavra a pesquisar
 	if (needle.empty()) {
 		cerr << "Word to search not found!";
@@ -186,7 +189,7 @@ int main(int argc, char* argv[]) {
 
 	if (sysinfo.dwNumberOfProcessors > 1) {
 		for (unsigned int i = 0; i < search.size(); i++) {
-			thr.push_back(new thread(runGrep, search[i], files[i]));
+			thr.push_back(new thread(runGrep,search[i]));
 		}
 
 		for (unsigned int i = 0; i < thr.size(); i++) {
@@ -200,7 +203,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	cin.get();
+//	cin.get();
 	return 0;
 }
 
