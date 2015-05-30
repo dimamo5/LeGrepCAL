@@ -6,6 +6,7 @@
  */
 
 #include "Grep.h"
+#include <ctime>
 
 Grep::Grep(int la, int ld, bool ic, bool im, string haystack, string needle, SSA algoritmo) :
 		linhasAntes(la), linhasDepois(ld), ignoreCase(ic), invertMatch(im), haystack(haystack), needle(needle) {
@@ -13,7 +14,7 @@ Grep::Grep(int la, int ld, bool ic, bool im, string haystack, string needle, SSA
 		this->algoritmo = new BoyerMoore(haystack, needle);
 	} else if (algoritmo == NAIVE) {
 		this->algoritmo = new Naive(haystack, needle);
-	}else if (algoritmo == KMP) {
+	} else if (algoritmo == KMP) {
 		this->algoritmo = new kmp(haystack, needle);
 	}
 }
@@ -23,11 +24,18 @@ Grep::Grep(string haystack, string needle, SSA algoritmo) {
 }
 
 void Grep::run() {
+
+	clock_t begin = clock();
+
 	if (this->ignoreCase) {
 		resultados = algoritmo->run(this->compareCaseInsensative);
 	} else {
 		resultados = algoritmo->run(this->compareCaseSensative);
 	}
+
+	clock_t end = clock();
+
+	this->tempoPesquisa = double(end - begin) / CLOCKS_PER_SEC;
 }
 
 void Grep::formatResults() {
@@ -50,7 +58,6 @@ void Grep::formatResults() {
 			inicioLinha = ite;
 
 			ite = resultados[i] - j;
-
 
 			while (resultados_temp[ite] != '\n' && ite < resultados_temp.length()) {
 				ite++;
@@ -121,6 +128,10 @@ bool Grep::compareCaseSensative(char c1, char c2) {
 		return true;
 	} else
 		return false;
+}
+
+double Grep::getTempoPesquisa() {
+	return tempoPesquisa;
 }
 
 bool Grep::compareCaseInsensative(char c1, char c2) {

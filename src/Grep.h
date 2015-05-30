@@ -21,6 +21,8 @@ private:
 	unsigned int linhasAntes = 1, linhasDepois = 1;
 	bool ignoreCase = false, invertMatch = false;
 
+	double tempoPesquisa;
+
 	string haystack, needle, result;
 
 	vector<int> resultados;
@@ -43,6 +45,8 @@ public:
 	string getResult();
 
 	void changeAlgoritmo(SSA novoAlgoritmo);
+
+	double getTempoPesquisa();
 
 	//Funcoes de Comparação
 

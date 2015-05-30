@@ -19,20 +19,21 @@
 
 using namespace std;
 
-void runGrep(Grep * grep, string file);
+void runGrep(Grep * grep);
 
 int main(int argc, char* argv[]) {
 	cout << "Grep" << endl;
 
 	int linhasAntes = 1, linhasDepois = 1, temp;
 	bool invertMatch = false, ignoreCase = false, needleFound = false;
-	string needle,tempString;
+	string needle, tempString;
 
-	Grep::SSA algoritmo_temp=Grep::BOYER_MOORE;
+	Grep::SSA algoritmo_temp = Grep::BOYER_MOORE;
 
 	vector<string> files;
 	vector<Grep *> search;
 
+	//Analisar Flags introduzidas e activar respetivas flags
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
 		//TODO Falta flags alternativas para cada tipo
@@ -111,16 +112,16 @@ int main(int argc, char* argv[]) {
 		} else if (flag == "--invert-match") {
 			invertMatch = true;
 		} else if (flag.compare(0, 12, "--algorithm=") == 0) {
-			tempString=flag.substr(12, flag.length());
+			tempString = flag.substr(12, flag.length());
 
-			if(tempString=="naive"){
-				algoritmo_temp=Grep::NAIVE;
-			}else if(tempString=="boyermoore"){
-				algoritmo_temp=Grep::BOYER_MOORE;
-			}else if(tempString=="kmp"){
-				algoritmo_temp=Grep::KMP;
-			}else{
-				cerr<<"Wrong Algorithm!"<<endl;
+			if (tempString == "naive") {
+				algoritmo_temp = Grep::NAIVE;
+			} else if (tempString == "boyermoore") {
+				algoritmo_temp = Grep::BOYER_MOORE;
+			} else if (tempString == "kmp") {
+				algoritmo_temp = Grep::KMP;
+			} else {
+				cerr << "Wrong Algorithm!" << endl;
 			}
 		} else if (needleFound) {
 			files.push_back(string(flag));
@@ -131,16 +132,31 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	//Verificar se existe a palavra a pesquisar
 	if (needle.empty()) {
 		cerr << "Word to search not found!";
 		return 1;
 	}
 
+	//Verificar se exitem ficheiros
 	if (files.empty()) {
 		cerr << "Files to search not found!";
 		return 1;
 	}
 
+	//Redimensionar o tamanha da consola para 1500 linhas em vez de 300
+	COORD newSize;
+	newSize.X=160;
+	newSize.Y=1500;
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),newSize);
+
+	/*CONSOLE_SCREEN_BUFFER_INFO infoBufferConsole;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&infoBufferConsole);
+	cout<<"colunas: "<<infoBufferConsole.dwSize.X<<"linhas: "<<infoBufferConsole.dwSize.Y<<endl;*/
+
+
+
+	//Criar Objecto do tipo Grep e inicializacao do buffer com o conteudo do ficheiro
 	for (unsigned int i = 0; i < files.size(); i++) {
 		ifstream ficheiro;
 		ficheiro.open(files[i].c_str());
@@ -156,14 +172,31 @@ int main(int argc, char* argv[]) {
 
 	}
 
+	//Sistema de Threads
+
+	/*
+	 * Para cada ficheiro que se tenha de pesquisar vai exitir um thread
+	 * Todas estas vao estar a correr em paralelo e quando acabarem é imprimido o output na consola
+	 */
+
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
 
-	vector<thread> thr;
+	vector<thread*> thr;
 
 	if (sysinfo.dwNumberOfProcessors > 1) {
 		for (unsigned int i = 0; i < search.size(); i++) {
-			thread(runGrep, search[i], files[i]).detach();
+			thr.push_back(new thread(runGrep, search[i], files[i]));
+		}
+
+		for (unsigned int i = 0; i < thr.size(); i++) {
+			thr[i]->join();
+
+			cor(BLACK, RED);
+			cout << "Pesquisa Ficheiro: " << files[i] << endl;
+			cout<<"Tempo Pesquisa:" << search[i]->getTempoPesquisa()<<endl;
+			cor(BLACK,WHITE);
+			cout << search[i]->getResult()<<endl<<endl;
 		}
 	}
 
@@ -171,28 +204,14 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void runGrep(Grep * grep, string file) {
-	double elapsed_secs_pesquisa;
-	double elapsed_secs_output;
+/**
+ *Exeutar o algoritmo de pesquisa de strings e formata o output consolante as flags
+ */
+void runGrep(Grep * grep) {
 
-	clock_t begin = clock();
 	grep->run();
-	clock_t end = clock();
 
-	elapsed_secs_pesquisa = double(end - begin) / CLOCKS_PER_SEC;
-
-	begin = clock();
 	grep->formatResults();
-	end = clock();
-	elapsed_secs_output = double(end - begin) / CLOCKS_PER_SEC;
 
-	cor(BLACK, RED);
-	cout << "Pesquisa Ficheiro: " << file << endl;
-
-	cout << "Tempo Pesquisa: " << elapsed_secs_pesquisa << endl;
-	cout << "Tempo Reorganizacao de Output: " << elapsed_secs_output << endl << endl;
-	cor(BLACK, WHITE);
-
-	cout << grep->getResult() << endl << endl;
 }
 
