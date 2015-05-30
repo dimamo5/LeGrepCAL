@@ -12,15 +12,26 @@
 #include <string>
 #include <ctime>
 #include <sstream>
+#include "mingw.thread.h"
 #include <cctype>
 #include "Grep.h"
+#include "auxFunc.h"
+
 using namespace std;
+
+void runGrep(Grep * grep, string file);
 
 int main(int argc, char* argv[]) {
 	cout << "Grep" << endl;
 
 	int linhasAntes = 1, linhasDepois = 1, temp;
-	bool invertMatch = false, ignoreCase = false;
+	bool invertMatch = false, ignoreCase = false, needleFound = false;
+	string needle,tempString;
+
+	Grep::SSA algoritmo_temp=Grep::BOYER_MOORE;
+
+	vector<string> files;
+	vector<Grep *> search;
 
 	for (int i = 1; i < argc; ++i) {
 		string flag(argv[i]);
@@ -99,46 +110,89 @@ int main(int argc, char* argv[]) {
 			ignoreCase = true;
 		} else if (flag == "--invert-match") {
 			invertMatch = true;
-		}
+		} else if (flag.compare(0, 12, "--algorithm=") == 0) {
+			tempString=flag.substr(12, flag.length());
 
-		else {
-			cerr << "Argumentos incorrectos!!!" << endl;
+			if(tempString=="naive"){
+				algoritmo_temp=Grep::NAIVE;
+			}else if(tempString=="boyermoore"){
+				algoritmo_temp=Grep::BOYER_MOORE;
+			}else if(tempString=="kmp"){
+				algoritmo_temp=Grep::KMP;
+			}else{
+				cerr<<"Wrong Algorithm!"<<endl;
+			}
+		} else if (needleFound) {
+			files.push_back(string(flag));
+
+		} else if (needleFound == false) {
+			needle = flag;
+			needleFound = true;
 		}
 	}
 
-	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << "\t Case Sensative: " << ignoreCase << "\t Invert Match: " << invertMatch
-			<< endl;
+	if (needle.empty()) {
+		cerr << "Word to search not found!";
+		return 1;
+	}
 
-	ifstream ficheiro;
-	ficheiro.open("resources/out.txt");
-	string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
+	if (files.empty()) {
+		cerr << "Files to search not found!";
+		return 1;
+	}
 
-	cout << "Tamanho Haystack:" << haystack.length() << endl;
+	for (unsigned int i = 0; i < files.size(); i++) {
+		ifstream ficheiro;
+		ficheiro.open(files[i].c_str());
 
-	Grep grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, "Sherlock Holmes", Grep::BOYER_MOORE);
-	clock_t begin = clock();
-	grep.run();
-	clock_t end = clock();
+		if (!ficheiro.is_open()) {
+			cerr << "Erro Abrir Ficheiro " << files[i] << endl;
+			return 1;
+		}
 
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		string haystack((std::istreambuf_iterator<char>(ficheiro)), (std::istreambuf_iterator<char>()));
 
-	cout << "Tempo Pesquisa" << elapsed_secs << endl;
+		search.push_back(new Grep(linhasAntes, linhasDepois, ignoreCase, invertMatch, haystack, needle, algoritmo_temp));
 
-	begin = clock();
-	grep.formatResults();
-	end = clock();
-	elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cout << "Tempo Reorganização de Output" << elapsed_secs << endl << endl;
+	}
 
-	cout << grep.getResult() << endl;
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo(&sysinfo);
 
+	vector<thread> thr;
+
+	if (sysinfo.dwNumberOfProcessors > 1) {
+		for (unsigned int i = 0; i < search.size(); i++) {
+			thread(runGrep, search[i], files[i]).detach();
+		}
+	}
+
+	cin.get();
 	return 0;
 }
 
-// First 4 bits are background, last 4 bits are foreground
-void cor(int background, int foreground) {
-	HANDLE hConsole;
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsole, foreground + 16 * background);
+void runGrep(Grep * grep, string file) {
+	double elapsed_secs_pesquisa;
+	double elapsed_secs_output;
+
+	clock_t begin = clock();
+	grep->run();
+	clock_t end = clock();
+
+	elapsed_secs_pesquisa = double(end - begin) / CLOCKS_PER_SEC;
+
+	begin = clock();
+	grep->formatResults();
+	end = clock();
+	elapsed_secs_output = double(end - begin) / CLOCKS_PER_SEC;
+
+	cor(BLACK, RED);
+	cout << "Pesquisa Ficheiro: " << file << endl;
+
+	cout << "Tempo Pesquisa: " << elapsed_secs_pesquisa << endl;
+	cout << "Tempo Reorganizacao de Output: " << elapsed_secs_output << endl << endl;
+	cor(BLACK, WHITE);
+
+	cout << grep->getResult() << endl << endl;
 }
 

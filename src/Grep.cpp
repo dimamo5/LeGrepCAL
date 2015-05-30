@@ -6,7 +6,6 @@
  */
 
 #include "Grep.h"
-#include <iostream>
 
 Grep::Grep(int la, int ld, bool ic, bool im, string haystack, string needle, SSA algoritmo) :
 		linhasAntes(la), linhasDepois(ld), ignoreCase(ic), invertMatch(im), haystack(haystack), needle(needle) {
@@ -51,6 +50,7 @@ void Grep::formatResults() {
 			inicioLinha = ite;
 
 			ite = resultados[i] - j;
+
 
 			while (resultados_temp[ite] != '\n' && ite < resultados_temp.length()) {
 				ite++;
