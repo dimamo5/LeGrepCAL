@@ -6,6 +6,7 @@
  */
 
 #include "BoyerMoore.h"
+#include <algorithm>
 
 BoyerMoore::BoyerMoore(string haystack, string needle) :
 		StringSearchAlgorith(haystack, needle) {
@@ -31,7 +32,7 @@ int BoyerMoore::indexOfFirst() {
 				return i;
 			}
 		}
-		i += fmax(offsetTable[needle.length() - 1 - j], charTable[haystack[i]]);
+		i += max(offsetTable[needle.length() - 1 - j], charTable[haystack[i]]);
 	}
 	return -1;
 }

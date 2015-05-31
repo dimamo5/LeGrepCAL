@@ -134,8 +134,7 @@ int main(int argc, char* argv[]) {
 //	cout << "Linhas Antes: " << linhasAntes << "\t Linhas Depois: " << linhasDepois << "\t Case Sensative: " << ignoreCase << "\t Invert Match: " << invertMatch
 //				<< endl;
 
-
-	//Verificar se existe a palavra a pesquisar
+//Verificar se existe a palavra a pesquisar
 	if (needle.empty()) {
 		cerr << "Word to search not found!";
 		return 1;
@@ -149,15 +148,13 @@ int main(int argc, char* argv[]) {
 
 	//Redimensionar o tamanha da consola para 1500 linhas em vez de 300
 	COORD newSize;
-	newSize.X=160;
-	newSize.Y=1500;
-	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),newSize);
+	newSize.X = 160;
+	newSize.Y = 1500;
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), newSize);
 
 	/*CONSOLE_SCREEN_BUFFER_INFO infoBufferConsole;
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&infoBufferConsole);
-	cout<<"colunas: "<<infoBufferConsole.dwSize.X<<"linhas: "<<infoBufferConsole.dwSize.Y<<endl;*/
-
-
+	 GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&infoBufferConsole);
+	 cout<<"colunas: "<<infoBufferConsole.dwSize.X<<"linhas: "<<infoBufferConsole.dwSize.Y<<endl;*/
 
 	//Criar Objecto do tipo Grep e inicializacao do buffer com o conteudo do ficheiro
 	for (unsigned int i = 0; i < files.size(); i++) {
@@ -189,7 +186,7 @@ int main(int argc, char* argv[]) {
 
 	if (sysinfo.dwNumberOfProcessors > 1) {
 		for (unsigned int i = 0; i < search.size(); i++) {
-			thr.push_back(new thread(runGrep,search[i]));
+			thr.push_back(new thread(runGrep, search[i]));
 		}
 
 		for (unsigned int i = 0; i < thr.size(); i++) {
@@ -197,13 +194,24 @@ int main(int argc, char* argv[]) {
 
 			cor(BLACK, RED);
 			cout << "Pesquisa Ficheiro: " << files[i] << endl;
-			cout<<"Tempo Pesquisa:" << search[i]->getTempoPesquisa()<<endl;
-			cor(BLACK,WHITE);
-			cout << search[i]->getResult()<<endl<<endl;
+			cout << "Tempo Pesquisa:" << search[i]->getTempoPesquisa() << endl;
+			cor(BLACK, WHITE);
+			cout << search[i]->getResult() << endl << endl;
+		}
+	} else {
+		for (unsigned int i = 0; i < search.size(); i++) {
+			search[i]->run();
+
+			search[i]->formatResults();
+
+			cor(BLACK, RED);
+			cout << "Pesquisa Ficheiro: " << files[i] << endl;
+			cout << "Tempo Pesquisa:" << search[i]->getTempoPesquisa() << endl;
+			cor(BLACK, WHITE);
+			cout << search[i]->getResult() << endl << endl;
 		}
 	}
 
-//	cin.get();
 	return 0;
 }
 
